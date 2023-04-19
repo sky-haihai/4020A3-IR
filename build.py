@@ -1,6 +1,6 @@
-import helper.unzip_gz as unzip
-import helper.preprocess as preprocess
-import helper.create_indexer as index
+import unzip_gz as unzip
+import preprocess as preprocess
+import create_indexer as index
 
 input_path = r'input\data'
 index_path = r'output\indexer'
