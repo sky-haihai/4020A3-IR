@@ -1,8 +1,8 @@
 import os
 import json
 from collections import defaultdict
-import preprocess as preprocess
-import calculate_similarity as similarity
+import src.preprocess as preprocess
+import src.calculate_similarity as similarity
 
 inverted_index_dir=r"output\indexer"
 topic_file=r"input\topics.txt"

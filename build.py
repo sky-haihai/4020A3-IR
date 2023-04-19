@@ -1,6 +1,6 @@
-import unzip_gz as unzip
-import preprocess as preprocess
-import create_indexer as index
+import src.unzip_gz as unzip
+import src.preprocess as preprocess
+import src.create_indexer as index
 
 input_path = r'input\data'
 index_path = r'output\indexer'

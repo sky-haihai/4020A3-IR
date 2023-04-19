@@ -49,20 +49,31 @@ def xmls_to_word_dict(xmls):
             temp= []
 
             # extracting html
+            print ("Extracting HTML...")
             html_tag = doc_tag.find('html')
+            content_str=''
             for tag in html_tag.find_all():
                 text=tag.get_text()
-                tokens = word_tokenize(text)
+                if text is not None:
+                    content_str+=text
+            
+            print('Preprocessing tokens')
+            print('\tTokenizing')
+            tokens = word_tokenize(content_str)
 
-                tokens = [word.lower() for word in tokens if word.isalpha()]
-                
-                # process words
-                filtered_tokens = [word for word in tokens if word not in stop_words]
-                stemmed_tokens = [stemmer.stem(word) for word in filtered_tokens]
-                only_words = [word for word in stemmed_tokens if word in english_words]
-
-                for word in only_words:
-                    temp.append(word.encode('utf-8').decode('utf-8'))
+            print('\tCheck if token is alpha')
+            tokens = [word.lower() for word in tokens if word.isalpha()]
+            
+            # process words
+            print('\tRemoving stop words')
+            filtered_tokens = [word for word in tokens if word not in stop_words]
+            print('\tStemming')
+            stemmed_tokens = [stemmer.stem(word) for word in filtered_tokens]
+            print('\tRemoving non-english words')
+            only_words = [word for word in stemmed_tokens if word in english_words]
+            print('\tTo utf-8')
+            for word in only_words:
+                temp.append(word.encode('utf-8').decode('utf-8'))
 
             result[docno] = temp
 

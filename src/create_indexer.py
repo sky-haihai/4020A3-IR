@@ -6,7 +6,6 @@ import multiprocessing
 
 num_threads = multiprocessing.cpu_count()*2
 
-# inverted_index = defaultdict(lambda: defaultdict(int))
 def process_word_dict(word_dict):
     inverted_index = defaultdict(lambda: defaultdict(int))
     for docno, words in word_dict.items():
@@ -32,11 +31,36 @@ def save_to_json(output_dir,inverted_index_grouped):
         with open(file_path, "w", encoding="utf-8") as f:
             json.dump(index, f, ensure_ascii=False, indent=2)
 
-def build_indexer(word_dict,output_dir):
+def split_dict(word_dict, n):
+    chunk_size = len(word_dict) // n
+    word_dict_items = list(word_dict.items())
+    return [dict(word_dict_items[i:i + chunk_size]) for i in range(0, len(word_dict_items), chunk_size)]
+
+def merge_inverted_indexes(indexes):
+    merged_index = defaultdict(lambda: defaultdict(int))
+    for index in indexes:
+        for word, postings in index.items():
+            for docno, count in postings.items():
+                merged_index[word][docno] += count
+    
+    return merged_index
+
+def build_indexer(word_dict, output_dir, num_threads=4):
     print("Building indexer...")
-    inverted_index=process_word_dict(word_dict)
+    
+    word_dict_chunks = split_dict(word_dict, num_threads)
+    
+    with ThreadPoolExecutor(max_workers=num_threads) as executor:
+        partial_indexes = list(executor.map(process_word_dict, word_dict_chunks))
+
+    inverted_index = merge_inverted_indexes(partial_indexes)
+    
     print("Grouping by initials...")
-    inverted_index_grouped=group_by_initial(inverted_index)
+    inverted_index_grouped = group_by_initial(inverted_index)
+    
     print("Saving to json...")
-    save_to_json(output_dir,inverted_index_grouped)
+    with ThreadPoolExecutor() as executor:
+        for initial_letter, index in inverted_index_grouped.items():
+            executor.submit(save_to_json, output_dir, initial_letter, index)
+
     print("Done!")
