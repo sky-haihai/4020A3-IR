@@ -1,7 +1,7 @@
 # Usage
 
-run build.py to build the inverted index
-after the index is built, run search.py to search for topics
+1. Run build.py to build the inverted index, the inverted index file is save to 'output\indexer'.
+2. After the index is built, run search.py to search for topics, the querying result is save to 'output\result.txt'.
 
 # Dependencies
 
